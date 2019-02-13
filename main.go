@@ -4,8 +4,8 @@ import (
 	"flag"
 	"time"
 
-	"github.com/seadiaz/tls-check/metrics"
-	"github.com/seadiaz/tls-check/network"
+	"github.com/seadiaz/tls-checker/metrics"
+	"github.com/seadiaz/tls-checker/network"
 
 	log "github.com/sirupsen/logrus"
 )
