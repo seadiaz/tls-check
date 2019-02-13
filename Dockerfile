@@ -1,5 +1,5 @@
 FROM drone/ca-certs
 
-ADD /tls-check /tls-check
+ADD /tls-checker /tls-checker
 
-ENTRYPOINT ["/tls-check"]
+ENTRYPOINT ["/tls-checker"]

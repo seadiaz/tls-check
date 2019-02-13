@@ -25,7 +25,7 @@ func main() {
 		log.Panicf("host is required")
 	}
 
-	channel := make(chan int)
+	channel := make(chan []int)
 
 	go network.ValidateHost(*host, *lookupTimeout, channel)
 

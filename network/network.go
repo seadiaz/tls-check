@@ -15,7 +15,7 @@ import (
 const evaluationPeriodInSeconds = 30 * time.Second
 
 //ValidateHost ...
-func ValidateHost(host string, timeout time.Duration, channel chan int) {
+func ValidateHost(host string, timeout time.Duration, channel chan []int) {
 	ips := lookupIPWithTimeout(host, timeout)
 	channel <- validateIPs(ips, host, timeout)
 	timer := time.NewTicker(evaluationPeriodInSeconds)
@@ -47,7 +47,7 @@ func resolveIP(host string, ch chan []net.IP) {
 	ch <- r
 }
 
-func validateIPs(ips []net.IP, host string, timeout time.Duration) int {
+func validateIPs(ips []net.IP, host string, timeout time.Duration) []int {
 	for _, ip := range ips {
 		dialer := net.Dialer{Timeout: timeout, Deadline: time.Now().Add(timeout + 5*time.Second)}
 		connection, err := tls.DialWithDialer(&dialer, "tcp", fmt.Sprintf("[%s]:443", ip), &tls.Config{ServerName: host})
@@ -79,15 +79,20 @@ func validateIPs(ips []net.IP, host string, timeout time.Duration) int {
 					continue
 				}
 
-				validityInHours := cert.NotAfter.Sub(time.Now())
-				validityInDays := getDays(validityInHours)
+				validity := cert.NotAfter.Sub(time.Now())
+				validityInHours := getHours(validity)
+				validityInDays := getDays(validity)
 				log.Infof("%s expiration: %d days", cert.Subject.CommonName, validityInDays)
-				return validityInDays
+				return []int{validityInHours, validityInDays}
 			}
 		}
 	}
 
-	return -1
+	return []int{}
+}
+
+func getHours(input time.Duration) int {
+	return int(input.Hours())
 }
 
 func getDays(input time.Duration) int {
